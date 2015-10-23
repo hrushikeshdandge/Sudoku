@@ -5,6 +5,7 @@
 
 int sudoku[9][9];
 
+
 void readPuzzle(FILE *file) {
 	for (int i = 0; i<9; i++) {
 			for (int j = 0; j<9; j++) {
@@ -23,6 +24,7 @@ void *rowChecker() {
 	}
 }
 */
+
 void *columnChecker() {
 	int incorrect = 0;
 	for (int column = 0; column < 9; column++) {
@@ -51,16 +53,42 @@ void *columnChecker() {
 		printf("Columns are all correct!\n"); }
 	return NULL;
 
+
 }
 
 void *check_box(){
-	//define first check
-	//int row = 0;
-	//int column = 0;
-	for(int count = 0; count < 9; count++){
-		for(int i = 0; i < 3; i++){
-			
+
+
+	int value;
+	int error = 0;
+	for(int countcolumn = 0; countcolumn <= 6; countcolumn+=3){
+		for(int countrow = 0; countrow <= 6; countrow+=3){
+			int flags[9] = {0,0,0,0,0,0,0,0,0};
+			for(int column = 0; column < 3; column++){
+				for(int row = 0; row < 3; row++){
+					value = sudoku[row + countrow][column + countcolumn];
+					printf("Value= %d\n",value);
+					if(flags[value - 1] == 1){
+						printf("ERROR IN ROW: %d COLUMN: %d\n",row + countrow + 1,column + countcolumn +1);
+						//printf("Value: %d", value);
+						int error = 1;
+						break;
+
+					}
+					else{
+						flags[value - 1] = 1;
+					}
+				}
+				if(error == 1){
+					break;
+				}
+			}
+			if(error==1)
+				printf("ERROR IN BOX: Column: %d, Row: %d",countcolumn,countrow);
+
 		}
+
+
 	}
 }
 
@@ -68,15 +96,28 @@ void *check_box(){
 int main() {
 
 
+
 	FILE *puzzle = fopen("puzzle.txt", "r");
 	readPuzzle(puzzle);
 
 	pthread_t pth2;
 	pthread_create(&pth2, 0, columnChecker, (void *) "Column");
+	//pthread_t pth;
+	pthread_t boxThread;
+	//pthread_create(&pth, 0, rowChecker, (void *) "Thread 1");
+	pthread_create(&boxThread,0,check_box,(void *)"Box checker");
+	pthread_join(boxThread,0);
+	//pthread_join(pth, 0);
 
 	pthread_join(pth2, 0);
 
 
+
+
+	
+
+
+	
 
 
 
