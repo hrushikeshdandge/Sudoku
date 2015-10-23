@@ -3,7 +3,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-//TEST CODE//
 int sudoku[9][9];
 
 void readPuzzle(FILE *file) {
@@ -15,7 +14,22 @@ void readPuzzle(FILE *file) {
 
 }
 
+void *rowChecker() {
+	for (int i = 0; i < 9; i++) {
+		if ([i] != [i + 1]) {
+
+		}
+	}
+}
+
 int main() {
+
+	printf("casual is working");
+	pthread_t pth;
+	pthread_create(&pth, 0, rowChecker, (void *) "Thread 1");
+
+	pthread_join(pth, 0);
+
 
 	FILE *puzzle = fopen("puzzle.txt", "r");
 	readPuzzle(puzzle);
