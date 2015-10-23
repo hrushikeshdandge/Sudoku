@@ -5,6 +5,10 @@
 
 int sudoku[9][9];
 
+typedef struct {
+	int column,row;
+} box_coordinates;
+
 int correct[3] = { 0, 0, 0 };
 void readPuzzle(FILE *file) {
 	for (int i = 0; i < 9; i++) {
@@ -28,7 +32,8 @@ void *rowChecker() {
 			}
 		}
 	}
-	printf("%d", passfail);
+	printf("Rowcheck pass(1)/fail(0): %d\n", passfail);
+	return NULL;
 }
 
 void *columnChecker() {
@@ -55,41 +60,55 @@ void *columnChecker() {
 				break;
 		}
 	}
+	return NULL;
 }
 
-void *check_box() {
+/*check the box that is sent into it.
+	it used the box coordinates to offset the validator when checking the values
+*/
+void *check_box(void * boxInfo) {
 
 	int value;
+	box_coordinates *coordinates = boxInfo;
+	int box_column = coordinates->column;
+	int box_row = coordinates->row;
+
 	int error = 0;
-	for (int countcolumn = 0; countcolumn <= 6; countcolumn += 3) {
-		for (int countrow = 0; countrow <= 6; countrow += 3) {
-			int flags[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-			for (int column = 0; column < 3; column++) {
-				for (int row = 0; row < 3; row++) {
-					value = sudoku[row + countrow][column + countcolumn];
-					printf("Value= %d\n", value);
-					if (flags[value - 1] == 1) {
-						printf("ERROR IN ROW: %d COLUMN: %d\n",
-								row + countrow + 1, column + countcolumn + 1);
-						//printf("Value: %d", value);
-						int error = 1;
-						break;
+	
+	//flags to check if the value was already seen in the box
+	int flags[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-					} else {
-						flags[value - 1] = 1;
-					}
-				}
-				if (error == 1) {
-					break;
-				}
+	//go through all the elements in the box
+	for (int column = 0; column < 3; column++) {
+		for (int row = 0; row < 3; row++) {
+			value = sudoku[row + box_row][column + box_column];
+			//printf("Value= %d\n", value);
+
+			//if the value has been found before, there is an error in the box
+			if (flags[value - 1] == 1) {
+				printf("ERROR IN ROW: %d COLUMN: %d\n", row + box_row + 1, column + box_column + 1);
+				printf("Value: %d", value);
+				error = 1;
+				break;
+
+			} else {
+				flags[value - 1] = 1;
 			}
-			if (error == 1)
-				printf("ERROR IN BOX: Column: %d, Row: %d", countcolumn,
-						countrow);
-
 		}
-
+		if (error == 1) {
+			break;
+		}
 	}
+	//prints out the location of the box if it has an error	
+	if (error == 1){
+		printf("ERROR IN BOX: Column: %d, Row: %d\n", box_row,
+			box_column);
+
+	}else
+		printf("Passed Box: Column: %d, Row: %d\n", box_row,
+			box_column);
+
+	return NULL;
 }
 
 int main() {
@@ -103,14 +122,27 @@ int main() {
 	pthread_t pth2;
 	pthread_create(&pth2, 0, columnChecker, (void *) "Column");
 
-	pthread_t boxThread;
-	pthread_create(&boxThread, 0, check_box, (void *) "Box checker");
+	pthread_t boxThread[9];
+	//start coordinates for the seprate boxes
+	box_coordinates boxes[9];
 
+	//makes threads for each box in sudoku by offsetting each box by the coordinates
+	int i = 0;
+	for (int countcolumn = 0; countcolumn <= 6; countcolumn += 3) {
+		for (int countrow = 0; countrow <= 6; countrow += 3) {
+			boxes[i].column = countcolumn;
+			boxes[i].row = countrow;
+			pthread_create(&boxThread[i], 0, check_box, (void *) &boxes[i]);
+			i++;
+		}
+	}
 	//////JOINS/////
 
 	pthread_join(pth, 0);
 	pthread_join(pth2, 0);
-	pthread_join(boxThread, 0);
+	for(int i = 0; i < 9; i++){
+		pthread_join(boxThread[i], 0);
+	}
 
 	return 0;
 }
