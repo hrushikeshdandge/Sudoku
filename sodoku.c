@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 int sudoku[9][9];
-
+int correct[3] = {0, 0, 0};
 void readPuzzle(FILE *file) {
 	for (int i = 0; i<9; i++) {
 			for (int j = 0; j<9; j++) {
@@ -49,6 +49,7 @@ void *columnChecker() {
 	}
 	if (incorrect != 1) {
 		printf("Columns are all correct!\n"); }
+		correct[0] = 1;
 	return NULL;
 
 }
