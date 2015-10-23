@@ -22,7 +22,21 @@ void *rowChecker() {
 	}
 }
 
+
+void *check_box(){
+	//define first check
+	int row = 0;
+	int column = 0;
+	for(int count = 0; i < 9; i++){
+		for(int i = 0; i < 3; i++){
+			
+		}
+	}
+}
+
+
 int main() {
+
 
 	printf("casual is working");
 	pthread_t pth;
@@ -33,6 +47,7 @@ int main() {
 
 	FILE *puzzle = fopen("puzzle.txt", "r");
 	readPuzzle(puzzle);
+
 
 	printf("%d", sudoku[0][0]);
 	printf("%d", sudoku[5][5]);
