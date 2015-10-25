@@ -21,6 +21,7 @@ void readPuzzle(FILE *file) {
 
 }
 //confirms that a specified number is not already used in the given row, column, and 3x3 section
+//Code referenced from: http://codereview.stackexchange.com/questions/37430/sudoku-solver-in-c
 int checkNum(int row, int column, int num){
 	//Determines the row and column start of the entry's box, setting them to a multiple of 3
 	int rStart = (row/3) * 3;
@@ -47,7 +48,8 @@ int checkNum(int row, int column, int num){
 	return flag;
 
 }
-
+//code referenced from http://codereview.stackexchange.com/questions/37430/sudoku-solver-in-c
+//Solves the sudoku problem
 int solver(int row, int col) {
 
 
