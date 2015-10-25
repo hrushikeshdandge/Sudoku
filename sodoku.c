@@ -21,7 +21,7 @@ void readPuzzle(FILE *file) {
 
 }
 //confirms that a specified number is not already used in the given row, column, and 3x3 section
-int checkNum(int puzzle[9][9], int row, int column, int num){
+int checkNum(int puzzle[][9], int row, int column, int num){
 	//Determines the row and column start of the entry's box
 	int rStart = (row/3) * 3;
 	int cStart = (column/3)*3;
@@ -38,14 +38,14 @@ int checkNum(int puzzle[9][9], int row, int column, int num){
 		//If number appears in the column, number is unavailable
 		if (puzzle[i][column] == num) return 0;
 		//If number appears in the box, it is unavailable.
-		if (puzzle[rStart+ (i/3)][cStart+(i/3)] == num) return 0;
+		if (puzzle[rStart+ (i%3)][cStart+(i/3)] == num) return 0;
 	}
 	printf("%d is available\n", num);
 	//return flag;
 	return 1;
 }
 
-int placeNum(int puzzle[9][9], int row, int col) {
+int placeNum(int puzzle[][9], int row, int col) {
 	int i = 0;
 
 	if (row < 9 && col < 9) {
@@ -56,7 +56,7 @@ int placeNum(int puzzle[9][9], int row, int col) {
 			if((row+1) < 9) {
 				return placeNum(puzzle, row +1, col);
 			} else if((col+1) < 9) {
-				return placeNum(puzzle, row, col+1);
+				return placeNum(puzzle, 0, col+1);
 			} else {
 				return 1;
 			}
@@ -79,7 +79,7 @@ int placeNum(int puzzle[9][9], int row, int col) {
 							puzzle[row][col] = 0;
 					//Increment to the next column if possible
 					} else if ((col+1)<9) {
-						if (placeNum(puzzle, row, col + 1)) return 1;
+						if (placeNum(puzzle, 0, col + 1)) return 1;
 						else puzzle[row][col] = 0;
 					}
 					else { //Completed
@@ -238,12 +238,19 @@ int main() {
 	readPuzzle(puzzle);
 
 	if (solver()){
-		printf("Solution found");
+		printf("Solution found\n");
 	}
 	else {
-		printf("No Solution");
+		printf("No Solution\n");
 	}
-	printf("Entry: %d", sudoku[2][0]);
+	for (int i = 0; i < 9; i++){
+		for (int j = 0; j < 9; j++) {
+			printf("%d ", sudoku[i][j]);
+			if (j == 8) {
+				printf("\n");
+			}
+		}
+	}
 
 /*
 	validate();
