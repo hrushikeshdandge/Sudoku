@@ -21,7 +21,7 @@ void readPuzzle(FILE *file) {
 
 }
 //confirms that a specified number is not already used in the given row, column, and 3x3 section
-int checkNum(int puzzle[9][9], int row, int column, int num){
+int checkNum(int row, int column, int num){
 	//Determines the row and column start of the entry's box, setting them to a multiple of 3
 	int rStart = (row/3) * 3;
 	int cStart = (column/3)*3;
@@ -32,15 +32,15 @@ int checkNum(int puzzle[9][9], int row, int column, int num){
 	for (int i = 0; i < 9; i++) {
 
 		//If number appears in the row, number is unavailable
-		if (puzzle[row][i] == num) {
+		if (sudoku[row][i] == num) {
 			flag = 0;
 		}
 		//If number appears in the column, number is unavailable
-		if (puzzle[i][column] == num) {
+		if (sudoku[i][column] == num) {
 			flag = 0;
 		}
 		//If number appears in the box, it is unavailable.
-		if (puzzle[rStart+ (i%3)][cStart+(i/3)] == num) {
+		if (sudoku[rStart+ (i%3)][cStart+(i/3)] == num) {
 			flag = 0;
 		}
 	}
@@ -48,15 +48,15 @@ int checkNum(int puzzle[9][9], int row, int column, int num){
 
 }
 
-int solver(int puzzle[9][9], int row, int col) {
+int solver(int row, int col) {
 
 
 		//If current number is not 0, increment where possible
-		if (puzzle[row][col] != 0) {
+		if (sudoku[row][col] != 0) {
 			if((row+1) < 9) {
-				return solver(puzzle, row +1, col);
+				return solver(row +1, col);
 			} else if((col+1) < 9) {
-				return solver(puzzle, 0, col+1);
+				return solver(0, col+1);
 			} else {
 				return 1;
 			}
@@ -64,26 +64,26 @@ int solver(int puzzle[9][9], int row, int col) {
 
 			for (int i=1; i<=9; i++){
 				//Confirm the number is available
-				if (checkNum(puzzle, row, col, i) == 1){
+				if (checkNum(row, col, i) == 1){
 					//If number is available, place in position
-					puzzle[row][col] = i;
+					sudoku[row][col] = i;
 					//increment to the next row if possible
 					if ((row+1) < 9) {
-						if (solver(puzzle, row + 1, col) == 1) {
+						if (solver(row + 1, col) == 1) {
 							return 1;
 						}
 
 						else {
-							puzzle[row][col] = 0;
+							sudoku[row][col] = 0;
 						}
 
 					//Increment to the next column if possible
 					} else if ((col+1)<9) {
-						if (solver(puzzle, 0, col + 1) == 1) {
+						if (solver(0, col + 1) == 1) {
 							return 1;
 						}
 						else {
-							puzzle[row][col] = 0;
+							sudoku[row][col] = 0;
 						}
 					}
 					else { //Completed
@@ -237,7 +237,7 @@ int main() {
 	FILE *puzzle = fopen("puzzle.txt", "r");
 	readPuzzle(puzzle);
 
-	if (solver(sudoku, 0, 0)){
+	if (solver(0, 0)){
 		printf("Solution found\n");
 	}
 	else {
